@@ -8,6 +8,8 @@ import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import type { AuthRepository } from './modules/auth/auth.repository';
 import { createAuthRouter } from './modules/auth/auth.routes';
 import { AuthService } from './modules/auth/auth.service';
+import { createCourseRoutes } from './modules/courses/courses.routes';
+import { createLessonRoutes } from './modules/lessons/lessons.routes';
 
 export interface AppDependencies {
   env: Env;
@@ -39,6 +41,8 @@ export function createApp({ env, authRepository, enableRateLimit = true }: AppDe
   const authService = new AuthService(authRepository, env);
   app.use('/api/auth', createAuthRouter({ service: authService, env, enableRateLimit }));
 
+  app.use('/api', createCourseRoutes(env));
+  app.use('/api', createLessonRoutes(env));
   app.use(notFoundHandler);
   app.use(errorHandler);
 

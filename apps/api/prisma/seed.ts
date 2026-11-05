@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { sampleCourses } from './sample.courses';
 
 const prisma = new PrismaClient();
 
@@ -26,6 +27,27 @@ async function main() {
   });
 
   console.log(`Admin ready: ${admin.email}`);
+
+  // Add the sample courses only when there are no courses yet
+  const courseCount = await prisma.course.count();
+  if (courseCount > 0) {
+    console.log(`Skipped sample courses (${courseCount} already exist)`);
+    return;
+  }
+
+  for (const course of sampleCourses) {
+    const { lessons, ...courseData } = course;
+    await prisma.course.create({
+      data: {
+        ...courseData,
+        published: true,
+        lessons: {
+          create: lessons.map((lesson:any, index:any) => ({ ...lesson, position: index + 1 })),
+        },
+      },
+    });
+  }
+  console.log(`Added ${sampleCourses.length} sample courses`);
 }
 
 main()
