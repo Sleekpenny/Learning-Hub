@@ -1,0 +1,23 @@
+{
+  "folders": [
+    { "name": "🏠 root", "path": "." },
+    { "name": "🌐 web (Next.js)", "path": "apps/web" },
+    { "name": "⚙️ api (Express)", "path": "apps/api" }
+  ],
+  "settings": {
+    "files.exclude": { "**/node_modules": true, "**/.next": true },
+    "search.exclude": { "**/node_modules": true, "**/.next": true, "**/package-lock.json": true },
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "typescript.preferences.importModuleSpecifier": "non-relative"
+  },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "bradlc.vscode-tailwindcss",
+      "Prisma.prisma",
+      "vitest.explorer"
+    ]
+  }
+}
