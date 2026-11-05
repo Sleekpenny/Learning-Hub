@@ -1,0 +1,13 @@
+node_modules
+.env
+.env.*
+!.env.example
+.next
+.vercel
+dist
+coverage
+*.log
+.DS_Store
+/.env
+./doc.setup.md
+.doc.setup.md
