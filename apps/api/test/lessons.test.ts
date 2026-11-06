@@ -16,6 +16,7 @@ const lesson = {
   delete: prisma.lesson.delete as Mock,
 };
 const transaction = prisma.$transaction as Mock;
+const enrollment = prisma.enrollment.findUnique as Mock;
 
 const newLesson = {
   title: 'Intro to components',
@@ -30,20 +31,62 @@ describe('GET /api/lessons/:id', () => {
     expect(res.status).toBe(401);
   });
 
-  it('returns the lesson and the other lessons in the course', async () => {
+  it('returns the lesson, the resume position and the other lessons with their status', async () => {
     lesson.findUnique.mockResolvedValue({
-      id: 'l1',
+      id: 'l2',
       courseId: 'c1',
       videoUrl: 'https://example.com/video.mp4',
       course: { id: 'c1', title: 'React', published: true },
     });
-    lesson.findMany.mockResolvedValue([{ id: 'l1' }, { id: 'l2' }]);
+    enrollment.mockResolvedValue({ id: 'e1' });
+    lesson.findMany.mockResolvedValue([
+      { id: 'l1', title: 'One', durationSeconds: 60, position: 1, progress: [{ completed: true, positionSeconds: 60 }] },
+      { id: 'l2', title: 'Two', durationSeconds: 90, position: 2, progress: [{ completed: false, positionSeconds: 40 }] },
+      { id: 'l3', title: 'Three', durationSeconds: 30, position: 3, progress: [] },
+    ]);
 
-    const res = await request(app).get('/api/lessons/l1').set(loginAs('LEARNER'));
+    const res = await request(app).get('/api/lessons/l2').set(loginAs('LEARNER'));
 
     expect(res.status).toBe(200);
     expect(res.body.data.lesson.videoUrl).toBeTruthy();
-    expect(res.body.data.lessons).toHaveLength(2);
+    expect(res.body.data.progress).toEqual({ positionSeconds: 40, completed: false });
+    expect(res.body.data.nextLessonId).toBe('l3');
+    expect(res.body.data.lessons.map((l: { status: string }) => l.status)).toEqual([
+      'COMPLETED',
+      'IN_PROGRESS',
+      'NOT_STARTED',
+    ]);
+  });
+
+  it('has no next lesson after the last one', async () => {
+    lesson.findUnique.mockResolvedValue({
+      id: 'l1',
+      courseId: 'c1',
+      course: { id: 'c1', title: 'React', published: true },
+    });
+    enrollment.mockResolvedValue({ id: 'e1' });
+    lesson.findMany.mockResolvedValue([
+      { id: 'l1', title: 'One', durationSeconds: 60, position: 1, progress: [] },
+    ]);
+
+    const res = await request(app).get('/api/lessons/l1').set(loginAs('LEARNER'));
+
+    expect(res.body.data.nextLessonId).toBeNull();
+    expect(res.body.data.progress).toEqual({ positionSeconds: 0, completed: false });
+  });
+
+  it('returns 403 NOT_ENROLLED when the learner has not enrolled', async () => {
+    lesson.findUnique.mockResolvedValue({
+      id: 'l1',
+      courseId: 'c1',
+      course: { id: 'c1', title: 'React', published: true },
+    });
+    enrollment.mockResolvedValue(null);
+
+    const res = await request(app).get('/api/lessons/l1').set(loginAs('LEARNER'));
+
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe('NOT_ENROLLED');
   });
 
   it('hides lessons of a draft course from learners but not from admins', async () => {

@@ -4,12 +4,15 @@ import express, { type Express } from 'express';
 import helmet from 'helmet';
 import type { Env } from './config/env';
 import { createDocsRouter } from './docs/docs.routes';
+import { createAdminRoutes } from './modules/admin/admin.routes';
+import { createCourseRoutes } from './modules/courses/courses.routes';
+import { createEnrollmentRoutes } from './modules/enrollments/enrollments.routes';
+import { createLessonRoutes } from './modules/lessons/lessons.routes';
+import { createProgressRoutes } from './modules/progress/progress.routes';
 import { errorHandler, notFoundHandler } from './middleware/error-handler';
 import type { AuthRepository } from './modules/auth/auth.repository';
 import { createAuthRouter } from './modules/auth/auth.routes';
 import { AuthService } from './modules/auth/auth.service';
-import { createCourseRoutes } from './modules/courses/courses.routes';
-import { createLessonRoutes } from './modules/lessons/lessons.routes';
 
 export interface AppDependencies {
   env: Env;
@@ -37,12 +40,18 @@ export function createApp({ env, authRepository, enableRateLimit = true }: AppDe
     res.json({ data: { status: 'ok', time: new Date().toISOString() } });
   });
 
+  // Interactive docs: open http://localhost:4000/api/docs
   app.use('/api', createDocsRouter());
+
   const authService = new AuthService(authRepository, env);
   app.use('/api/auth', createAuthRouter({ service: authService, env, enableRateLimit }));
 
   app.use('/api', createCourseRoutes(env));
   app.use('/api', createLessonRoutes(env));
+  app.use('/api', createEnrollmentRoutes(env));
+  app.use('/api', createProgressRoutes(env));
+  app.use('/api', createAdminRoutes(env));
+
   app.use(notFoundHandler);
   app.use(errorHandler);
 

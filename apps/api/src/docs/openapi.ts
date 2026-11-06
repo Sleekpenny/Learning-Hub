@@ -42,7 +42,8 @@ export const openApiSpec = {
     { name: 'System', description: 'Health checks' },
     { name: 'Auth', description: 'Sign up, log in, sessions' },
     { name: 'Courses', description: 'Public catalog' },
-    { name: 'Lessons', description: 'Open a lesson (needs login)' },
+    { name: 'Lessons', description: 'Open a lesson (needs login and enrollment)' },
+    { name: 'Learning', description: 'Enroll, save video progress, learner dashboard (needs login)' },
     { name: 'Admin', description: 'Manage courses and lessons (admin only)' },
   ],
   paths: {
@@ -231,11 +232,15 @@ export const openApiSpec = {
     '/api/lessons/{id}': {
       get: {
         tags: ['Lessons'],
-        summary: 'Open a lesson: video link plus the other lessons in the course (needs login)',
+        summary: 'Open a lesson: video link, resume position and the other lessons with status (needs login and enrollment)',
+        description:
+          'Returns `{ lesson, progress, nextLessonId, lessons }`. `progress.positionSeconds` is where to start the video. ' +
+          'Each item in `lessons` has a `status`: NOT_STARTED, IN_PROGRESS or COMPLETED. Admins can open any lesson.',
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
         responses: {
-          '200': { description: '{ lesson, lessons }' },
+          '200': { description: '{ lesson, progress, nextLessonId, lessons }' },
           '401': errorResponse('Not logged in'),
+          '403': errorResponse('NOT_ENROLLED: enroll in the course first'),
           '404': errorResponse('Not found'),
         },
       },
@@ -254,6 +259,108 @@ export const openApiSpec = {
         summary: 'Delete a lesson (admin)',
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
         responses: { '204': { description: 'Deleted' }, '404': errorResponse('Not found') },
+      },
+    },
+    '/api/courses/{courseId}/enroll': {
+      post: {
+        tags: ['Learning'],
+        summary: 'Enroll the logged in user in a published course',
+        parameters: [{ name: 'courseId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '201': { description: 'Enrolled' },
+          '401': errorResponse('Not logged in'),
+          '404': errorResponse('Course not found or not published'),
+          '409': errorResponse('ALREADY_ENROLLED'),
+        },
+      },
+    },
+    '/api/courses/{courseId}/progress': {
+      get: {
+        tags: ['Learning'],
+        summary: 'My progress in one course',
+        description:
+          'Returns `enrolled`, `lessonCount`, `completedLessons`, `progressPercent`, `status`, `resumeLessonId` ' +
+          'and a `lessons` array with the status and saved position of every lesson.',
+        parameters: [{ name: 'courseId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Progress' }, '404': errorResponse('Course not found') },
+      },
+    },
+    '/api/lessons/{id}/progress': {
+      put: {
+        tags: ['Learning'],
+        summary: 'Save the watched position and completion of a lesson',
+        description:
+          'Call every few seconds while the video plays, and once with `completed: true` when it ends. ' +
+          'A completed lesson stays completed. When every lesson of a course is completed, the enrollment is marked complete.',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['positionSeconds'],
+                properties: {
+                  positionSeconds: { type: 'integer', example: 42 },
+                  completed: { type: 'boolean', example: false },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: '{ progress, course: { lessonCount, completedLessons, progressPercent, completed } }' },
+          '400': errorResponse('VALIDATION_ERROR'),
+          '403': errorResponse('NOT_ENROLLED'),
+          '404': errorResponse('Lesson not found'),
+        },
+      },
+    },
+    '/api/me/courses': {
+      get: {
+        tags: ['Learning'],
+        summary: 'My enrolled courses with progress',
+        description: 'Each course has `progressPercent`, `status`, `completedLessons`, `lessonCount` and `resumeLessonId`.',
+        responses: { '200': { description: 'Courses, most recently opened first' }, '401': errorResponse('Not logged in') },
+      },
+    },
+    '/api/me/dashboard': {
+      get: {
+        tags: ['Learning'],
+        summary: 'Learner dashboard summary',
+        description: 'Returns `stats` (enrolledCourses, inProgress, completed, lessonsCompleted) and `continueLearning` (up to 4 courses).',
+        responses: { '200': { description: 'Dashboard data' }, '401': errorResponse('Not logged in') },
+      },
+    },
+    '/api/admin/dashboard': {
+      get: {
+        tags: ['Admin'],
+        summary: 'Admin overview (admin)',
+        description: 'Returns `totals`, `recentEnrollments` and `topCourses`.',
+        responses: { '200': { description: 'Dashboard data' }, '403': errorResponse('Not an admin') },
+      },
+    },
+    '/api/admin/learners': {
+      get: {
+        tags: ['Admin'],
+        summary: 'List learners (admin)',
+        responses: { '200': { description: 'Learners with enrolledCourses (latest 100)' }, '403': errorResponse('Not an admin') },
+      },
+    },
+    '/api/admin/learners/{id}': {
+      get: {
+        tags: ['Admin'],
+        summary: 'One learner with their courses and progress (admin)',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: '{ user, courses }' }, '404': errorResponse('Learner not found') },
+      },
+    },
+    '/api/admin/courses/{id}/learners': {
+      get: {
+        tags: ['Admin'],
+        summary: 'Learners taking a course and how far they have got (admin)',
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: '{ course, learners }' }, '404': errorResponse('Course not found') },
       },
     },
     '/api/auth/me': {

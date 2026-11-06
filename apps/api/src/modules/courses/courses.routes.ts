@@ -69,7 +69,7 @@ export function createCourseRoutes(env: Env) {
 
   router.get('/courses/:id', async (req, res) => {
     const course = await prisma.course.findUnique({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       include: {
         // videoUrl is left out here. It is only sent when a logged in user opens a lesson.
         lessons: {
@@ -89,7 +89,7 @@ export function createCourseRoutes(env: Env) {
 
   router.get('/admin/courses/:id', ...adminOnly, async (req, res) => {
     const course = await prisma.course.findUnique({
-      where: { id: req.params.id },
+      where: { id: String(req.params.id) },
       include: { lessons: { orderBy: { position: 'asc' } } },
     });
     if (!course) throw AppError.notFound('Course not found');
@@ -108,19 +108,19 @@ export function createCourseRoutes(env: Env) {
   });
 
   router.patch('/courses/:id', ...adminOnly, validate({ body: updateCourseSchema }), async (req, res) => {
-    const existing = await prisma.course.findUnique({ where: { id: req.params.id } });
+    const existing = await prisma.course.findUnique({ where: { id: String(req.params.id) } });
     if (!existing) throw AppError.notFound('Course not found');
 
-    const course = await prisma.course.update({ where: { id: req.params.id }, data: req.body });
+    const course = await prisma.course.update({ where: { id: String(req.params.id) }, data: req.body });
     res.json({ data: course });
   });
 
   // Lessons, enrollments and progress for this course are deleted with it
   router.delete('/courses/:id', ...adminOnly, async (req, res) => {
-    const existing = await prisma.course.findUnique({ where: { id: req.params.id } });
+    const existing = await prisma.course.findUnique({ where: { id: String(req.params.id) } });
     if (!existing) throw AppError.notFound('Course not found');
 
-    await prisma.course.delete({ where: { id: req.params.id } });
+    await prisma.course.delete({ where: { id: String(req.params.id) } });
     res.status(204).end();
   });
 
