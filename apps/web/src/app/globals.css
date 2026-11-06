@@ -80,39 +80,3 @@
     @apply font-sans;
   }
 }
-
-/* Dark-only theme — no light mode. All variables default to dark values. */
-:root {
-  --background: #080809;
-  --foreground: #f0f0f4;
-  --card: #111114;
-  --card-foreground: #f0f0f4;
-  --popover: #18181c;
-  --popover-foreground: #f0f0f4;
-  --primary: #00c8d4;
-  --primary-foreground: #080809;
-  --secondary: #18181c;
-  --secondary-foreground: #f0f0f4;
-  --muted: #1e1e23;
-  --muted-foreground: #808090;
-  --accent: #1e1e23;
-  --accent-foreground: #f0f0f4;
-  --destructive: #ff4d4f;
-  --border: #2a2a30;
-  --input: #2a2a30;
-  --ring: #00c8d4;
-  --radius: 0.75rem;
-  --chart-1: #00c8d4;
-  --chart-2: #6457f9;
-  --chart-3: #34d399;
-  --chart-4: #fbbf24;
-  --chart-5: #ff4d4f;
-  --sidebar: #111114;
-  --sidebar-foreground: #f0f0f4;
-  --sidebar-primary: #00c8d4;
-  --sidebar-primary-foreground: #080809;
-  --sidebar-accent: #1e1e23;
-  --sidebar-accent-foreground: #f0f0f4;
-  --sidebar-border: #2a2a30;
-  --sidebar-ring: #00c8d4;
-}
