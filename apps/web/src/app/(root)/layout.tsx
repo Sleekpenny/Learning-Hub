@@ -1,6 +1,4 @@
 
-export const instant = false;
-
 const Layout = async ({children}: {children: React.ReactNode}) => {
 
     return  (

@@ -1,1 +1,28 @@
-export { cn } from "cn"
+import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from "clsx";
+import { Role } from "@/types/global";
+import { ApiError } from "./api";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+// Only allow redirects to pages on this site
+export function safeNext(value: string | null) {
+  return value && value.startsWith("/") && !value.startsWith("//") ? value : null;
+}
+
+// Where a user lands after logging in. Admins stay in /admin, learners never go there.
+export function landingPath(role: Role, next: string | null) {
+  if (role === "ADMIN") return next?.startsWith("/admin") ? next : "/admin";
+  return next && !next.startsWith("/admin") ? next : "/dashboard";
+}
+
+export function toFailure(error: unknown): { success: false; code: string; message: string;  } {
+  if (error instanceof ApiError) {
+    return { success: false, code: error.code, message: error.message, };
+  }
+  return {
+     success : false, code: "UNKNOWN", message: "Something went wrong. Please try again.",
+  }
+}

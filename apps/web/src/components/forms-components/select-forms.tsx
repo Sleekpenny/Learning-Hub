@@ -5,8 +5,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import { Label } from "../ui/label";
+import { SelectFieldProps } from "@/types/global";
 
 const SelectFields = ({
   required = false,

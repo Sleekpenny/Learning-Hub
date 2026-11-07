@@ -6,7 +6,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../ui/popover";
+} from "@/components/ui/popover";
 import {
   Command,
   CommandEmpty,
@@ -14,7 +14,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "../ui/command";
+} from "@/components/ui/command";
 
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";

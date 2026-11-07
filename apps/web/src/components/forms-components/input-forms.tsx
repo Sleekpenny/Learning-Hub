@@ -13,6 +13,7 @@ const InputFields = ({
   validation,
   error,
   register,
+  hint
 }: FormInputProps) => {
   return (
     <div className="space-y-5">
@@ -31,7 +32,7 @@ const InputFields = ({
         })}
         {...register(name, validation)}
       />
-
+      {hint}
       {error && (<p className="text-sm text-red-500">{error.message}</p>)}
     </div>
   );
