@@ -79,6 +79,19 @@ export const openApiSpec = {
       post: {
         tags: ['Auth'],
         summary: 'Log in with email and password',
+        description:
+          'Send `X-Login-Portal: admin` from the admin login form, or `learner` (the default) from the learner form. ' +
+          'The role must match: admins can only sign in through the admin form and learners only through the learner form. ' +
+          'The check runs after the password is verified, and no cookies are set when it fails.',
+        parameters: [
+          {
+            name: 'X-Login-Portal',
+            in: 'header',
+            required: false,
+            schema: { type: 'string', enum: ['learner', 'admin'], default: 'learner' },
+            description: 'Which login form the user used',
+          },
+        ],
         requestBody: {
           required: true,
           content: {
@@ -89,6 +102,7 @@ export const openApiSpec = {
           '200': userResponse('Logged in. Session cookies are set.'),
           '400': errorResponse('VALIDATION_ERROR'),
           '401': errorResponse('INVALID_CREDENTIALS: wrong email or password'),
+          '403': errorResponse('NOT_ADMIN (learner used the admin form) or USE_ADMIN_LOGIN (admin used the learner form)'),
           '429': errorResponse('RATE_LIMITED'),
         },
       },
@@ -409,11 +423,13 @@ export const openApiSpec = {
       },
       SignupBody: {
         type: 'object',
-        required: ['name', 'email', 'password'],
+        required: ['name', 'email', 'password', 'country', 'areaOfInterest'],
         properties: {
           name: { type: 'string', example: 'Ada Lovelace' },
           email: { type: 'string', example: 'ada@example.com' },
           password: { type: 'string', example: 'Sup3rSecret' },
+          country: { type: 'string', example: 'Nigeria' },
+          areaOfInterest: { type: 'string', example: 'Web Development' },
         },
       },
       LoginBody: {

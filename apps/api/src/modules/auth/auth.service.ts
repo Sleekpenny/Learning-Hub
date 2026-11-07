@@ -4,7 +4,7 @@ import { AppError } from '../../lib/errors';
 import { hashPassword, verifyPassword } from '../../lib/password';
 import { generateRefreshToken, hashToken, signAccessToken } from '../../lib/tokens';
 import type { AuthRepository } from './auth.repository';
-import type { LoginInput, SignupInput } from './auth.schemas';
+import type { LoginInput, LoginPortal, SignupInput } from './auth.schemas';
 import { toPublicUser, type PublicUser, type Session, type UserRecord } from './auth.types';
 
 type AuthConfig = Pick<
@@ -39,12 +39,14 @@ export class AuthService {
       passwordHash: await hashPassword(input.password, this.config.BCRYPT_ROUNDS),
       // Public signup ALWAYS creates a learner. Admins are created by the seed script only.
       role: 'LEARNER',
+      country: input.country,
+      areaOfInterest: input.areaOfInterest,
     });
 
     return this.issueSession(user, randomUUID());
   }
 
-  async login(input: LoginInput): Promise<Session> {
+  async login(input: LoginInput, portal: LoginPortal = 'learner'): Promise<Session> {
     const user = await this.repo.findUserByEmail(input.email);
 
     if (!user) {
@@ -57,6 +59,16 @@ export class AuthService {
     const passwordMatches = await verifyPassword(input.password, user.passwordHash);
     if (!passwordMatches) {
       throw AppError.unauthorized(INVALID_CREDENTIALS, 'INVALID_CREDENTIALS');
+    }
+
+    // The password is correct, so it is safe to tell this person which form to use.
+    // Doing the check before this point would let a stranger find out which emails are admins.
+    // No session is created when the form does not match the role.
+    if (portal === 'admin' && user.role !== 'ADMIN') {
+      throw AppError.forbidden('This account does not have admin access', 'NOT_ADMIN');
+    }
+    if (portal === 'learner' && user.role === 'ADMIN') {
+      throw AppError.forbidden('Admin accounts sign in from the Admin tab', 'USE_ADMIN_LOGIN');
     }
 
     return this.issueSession(user, randomUUID());

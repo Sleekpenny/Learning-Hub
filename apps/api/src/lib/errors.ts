@@ -21,8 +21,8 @@ export class AppError extends Error {
     return new AppError(401, code, message);
   }
 
-  static forbidden(message = 'You do not have permission to do this') {
-    return new AppError(403, 'FORBIDDEN', message);
+  static forbidden(message = 'You do not have permission to do this', code = 'FORBIDDEN') {
+    return new AppError(403, code, message);
   }
 
   static notFound(message = 'Resource not found') {

@@ -29,6 +29,20 @@ describe('POST /api/auth/signup', () => {
     expect(cookies.find((c) => c.startsWith('refresh_token='))).toContain('Path=/api/auth');
   });
 
+  it('saves the country and area of interest and returns them', async () => {
+    const res = await request(app).post('/api/auth/signup').send(validSignup);
+    expect(res.body.data.user).toMatchObject({ country: 'Nigeria', areaOfInterest: 'Web Development' });
+    expect(repo.users[0]).toMatchObject({ country: 'Nigeria', areaOfInterest: 'Web Development' });
+  });
+
+  it.each([['country'], ['areaOfInterest']])('requires %s', async (field) => {
+    const body: Record<string, string> = { ...validSignup };
+    delete body[field];
+    const res = await request(app).post('/api/auth/signup').send(body);
+    expect(res.status).toBe(400);
+    expect(res.body.error.details.map((d: { field: string }) => d.field)).toContain(field);
+  });
+
   it('stores a hashed password, not the plain one', async () => {
     await request(app).post('/api/auth/signup').send(validSignup);
     expect(repo.users[0]?.passwordHash).toMatch(/^\$2[aby]\$/);
@@ -236,13 +250,66 @@ describe('POST /api/auth/logout', () => {
 });
 
 describe('admin accounts', () => {
-  it('an admin can log in and gets the ADMIN role', async () => {
+  const admin = { email: 'admin@example.com', password: 'Adm1nPassword' };
+
+  it('an admin can log in from the admin form and gets the ADMIN role', async () => {
     await createAdmin(repo);
-    const res = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'admin@example.com', password: 'Adm1nPassword' });
+    const res = await request(app).post('/api/auth/login').set('X-Login-Portal', 'admin').send(admin);
     expect(res.status).toBe(200);
     expect(res.body.data.user.role).toBe('ADMIN');
+    expect(getCookie(res.headers['set-cookie'], 'access_token')).toBeTruthy();
+  });
+});
+
+describe('login portal header (X-Login-Portal)', () => {
+  const admin = { email: 'admin@example.com', password: 'Adm1nPassword' };
+  const learner = { email: validSignup.email, password: validSignup.password };
+
+  beforeEach(async () => {
+    await createAdmin(repo);
+    await request(app).post('/api/auth/signup').send(validSignup);
+  });
+
+  it('a learner cannot use the admin form: 403 NOT_ADMIN and no cookies', async () => {
+    const res = await request(app).post('/api/auth/login').set('X-Login-Portal', 'admin').send(learner);
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe('NOT_ADMIN');
+    expect(res.headers['set-cookie']).toBeUndefined();
+  });
+
+  it('an admin cannot use the learner form (with or without the header): 403 and no cookies', async () => {
+    const withHeader = await request(app).post('/api/auth/login').set('X-Login-Portal', 'learner').send(admin);
+    const withoutHeader = await request(app).post('/api/auth/login').send(admin);
+    for (const res of [withHeader, withoutHeader]) {
+      expect(res.status).toBe(403);
+      expect(res.body.error.code).toBe('USE_ADMIN_LOGIN');
+      expect(res.headers['set-cookie']).toBeUndefined();
+    }
+  });
+
+  it('a learner still logs in with the learner header or no header', async () => {
+    const withHeader = await request(app).post('/api/auth/login').set('X-Login-Portal', 'learner').send(learner);
+    const withoutHeader = await request(app).post('/api/auth/login').send(learner);
+    expect(withHeader.status).toBe(200);
+    expect(withoutHeader.status).toBe(200);
+  });
+
+  it('a wrong password on the admin form is the same 401 as everywhere else (no leak about who is an admin)', async () => {
+    const wrongAdmin = await request(app)
+      .post('/api/auth/login')
+      .set('X-Login-Portal', 'admin')
+      .send({ email: admin.email, password: 'WrongPassword1' });
+    const unknown = await request(app)
+      .post('/api/auth/login')
+      .set('X-Login-Portal', 'admin')
+      .send({ email: 'nobody@example.com', password: 'WrongPassword1' });
+    expect(wrongAdmin.status).toBe(401);
+    expect(wrongAdmin.body).toEqual(unknown.body);
+  });
+
+  it('rejects an unknown header value with 400', async () => {
+    const res = await request(app).post('/api/auth/login').set('X-Login-Portal', 'superuser').send(learner);
+    expect(res.status).toBe(400);
   });
 });
 
