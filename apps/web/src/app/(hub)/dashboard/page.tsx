@@ -3,7 +3,6 @@ import { LazySection } from "@/components/common/lazy-section";
 import CourseCard from "@/components/courses/course-card";
 import { CourseGridSkeleton } from "@/components/courses/course-grid-skeleton";
 import DashboardPanel from "@/components/dashboard/dashboard-panel";
-import HeroSection from "@/components/home/hero-section";
 import { Button } from "@/components/ui/button";
 import { StateMessage } from "@/components/ui/state-message";
 import { useCourses } from "@/lib/queries";

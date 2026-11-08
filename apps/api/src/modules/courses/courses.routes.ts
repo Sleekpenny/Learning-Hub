@@ -24,10 +24,11 @@ function listCourses(onlyPublished: boolean): RequestHandler {
     const where = {
       ...(onlyPublished && { published: true }),
       ...(category && { category }),
+      // Search matches the title or the category, so "web development" finds the Web Development courses
       ...(q && {
         OR: [
           { title: { contains: q, mode: 'insensitive' as const } },
-          { description: { contains: q, mode: 'insensitive' as const } },
+          { category: { contains: q, mode: 'insensitive' as const } },
         ],
       }),
     };

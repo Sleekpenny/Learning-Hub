@@ -132,7 +132,7 @@ export const openApiSpec = {
         tags: ['Courses'],
         summary: 'List published courses',
         parameters: [
-          { name: 'q', in: 'query', schema: { type: 'string' }, description: 'Search title and description' },
+          { name: 'q', in: 'query', schema: { type: 'string' }, description: 'Search the title and the category (case-insensitive)' },
           { name: 'category', in: 'query', schema: { type: 'string' } },
           { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
           { name: 'limit', in: 'query', schema: { type: 'integer', default: 12, maximum: 50 } },
