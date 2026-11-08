@@ -82,7 +82,7 @@ const PopularCourses = () => {
           ))}
         </div>
 
-        {/* The courses */}
+
         <div data-reveal className="mt-8">
           {courses.isPending ? (
             <CourseGridSkeleton count={4} columns="lg:grid-cols-4" />

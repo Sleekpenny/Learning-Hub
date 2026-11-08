@@ -26,9 +26,9 @@ const LogInForm = ({ portal }: { portal: LoginPortal }) => {
 
   const onSubmit = async (data: SignInFormData) => {
     try {
-      // const result = await loginAction(data, portal);
+      const result = await loginAction(data, portal);
       console.log(data);
-      //startSession(result.data);
+      //startSession(result);
       //router.replace(landingPath(result.data.role, next));
     } catch (e) {
       console.error(e);

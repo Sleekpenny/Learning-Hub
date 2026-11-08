@@ -2,7 +2,6 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
-
 const RootLayout = ({ children }: LayoutProps<"/">) => {
   return (
     <html lang="en" className={`${GeistSans.variable} h-full antialiased`}>

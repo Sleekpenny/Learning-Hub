@@ -4,7 +4,6 @@ import AuthIllustration from "@/components/auth/auth-illustration";
 export const instant = false;
 
 const Layout = async ({ children }: { children: React.ReactNode }) => {
-  //const date =  new Date().getFullYear();
   return (
 <div className="min-h-screen p-3 sm:p-5  overflow-hidden bg-gradient-to-br from-accent-ai/10 via-white to-accent-primary/10 ring-1">
       <div className="mx-auto flex w-full max-w-7xl flex-col ring-border sm:min-h-[calc(100vh-2.5rem)]">

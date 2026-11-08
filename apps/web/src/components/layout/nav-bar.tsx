@@ -51,10 +51,10 @@ export function Navbar() {
     </Button>
   ) : (
     <>
-      <Link href="/login" onClick={() => setMenuOpen(false)} className={buttonVariants({ variant: "outline" })}>
-        Sign in
+      <Link href="/sign-in" onClick={() => setMenuOpen(false)} className={buttonVariants({ variant: "outline" })}>
+        Login
       </Link>
-      <Link href="/signup" onClick={() => setMenuOpen(false)} className={buttonVariants()}>
+      <Link href="/sign-up" onClick={() => setMenuOpen(false)} className={buttonVariants()}>
         Register
       </Link>
     </>
