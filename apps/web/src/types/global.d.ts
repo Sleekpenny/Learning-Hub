@@ -93,3 +93,8 @@ export type SelectFieldProps = {
         error?: FieldError;
         required?: boolean;
     };
+
+export type Props = {
+  course: Course;
+  progress?: { progressPercent: number; status: Status };
+};

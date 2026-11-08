@@ -27,6 +27,7 @@ function getQueryClient() {
   return browserQueryClient;
 }
 
+// Keeps login and logout in step across open tabs
 function AuthSync() {
   useAuthSync();
   return null;

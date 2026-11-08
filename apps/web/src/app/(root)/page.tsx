@@ -1,19 +1,15 @@
-// import { LazySection } from "@/components/common/lazy-section";
-// import { HeroSection } from "@/components/home/hero-section";
-// import {
-//   AboutSection,
-//   CtaSection,
-//   FeaturesStrip,
-//   HowItWorks,
-//   PopularCourses,
-// } from "@/components/home/lazy-sections";
+import { LazySection } from "@/components/common/lazy-section";
+import AboutSection from "@/components/home/about-section";
+import CtaSection from "@/components/home/cta-section";
+import FeaturesStrip from "@/components/home/features-strip";
+import HeroSection from "@/components/home/hero-section";
+import HowItWorks from "@/components/home/how-it-works";
+import PopularCourses from "@/components/home/popular-courses";
 
-// The hero loads with the page. Every section below it loads when the user scrolls to it.
 const Home = () => {
   return (
-    <>
-    <p>hello</p>
-      {/* <HeroSection />
+    <div>
+   <HeroSection />
       <LazySection id="features" height={140}>
         <FeaturesStrip />
       </LazySection>
@@ -28,8 +24,8 @@ const Home = () => {
       </LazySection>
       <LazySection id="get-started" height={300}>
         <CtaSection />
-      </LazySection> */}
-    </>
+      </LazySection>
+    </div>
   );
 }
 
