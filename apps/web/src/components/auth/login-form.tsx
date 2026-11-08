@@ -7,11 +7,10 @@ import { useStartSession } from "@/lib/auth";
 import { LoginPortal, SignInFormData } from "@/types/global";
 import { loginAction } from "@/actions/auth";
 
-
 const LogInForm = ({ portal }: { portal: LoginPortal }) => {
-    const startSession = useStartSession();
-    const router = useRouter();
-    //const next = safeNext(useSearchParams().get("next"));
+  const startSession = useStartSession();
+  const router = useRouter();
+  //const next = safeNext(useSearchParams().get("next"));
 
   const {
     register,
@@ -27,25 +26,27 @@ const LogInForm = ({ portal }: { portal: LoginPortal }) => {
 
   const onSubmit = async (data: SignInFormData) => {
     try {
-       // const result = await loginAction(data, portal);
+      // const result = await loginAction(data, portal);
       console.log(data);
-        //startSession(result.data); 
-        //router.replace(landingPath(result.data.role, next));
+      //startSession(result.data);
+      //router.replace(landingPath(result.data.role, next));
     } catch (e) {
       console.error(e);
-    //     toast.error('Sign in failed', {
-    //     description: Object.keys(result.fields).length === 0 ? result.message : null
-    //   })
+      //     toast.error('Sign in failed', {
+      //     description: Object.keys(result.fields).length === 0 ? result.message : null
+      //   })
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" >
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <InputFields
         name="email"
         label="Email"
         type="email"
-        placeholder={portal === "admin" ? "admin@example.com" : "you@example.com"}
+        placeholder={
+          portal === "admin" ? "admin@example.com" : "you@example.com"
+        }
         register={register}
         error={errors.email}
         validation={{
@@ -72,15 +73,14 @@ const LogInForm = ({ portal }: { portal: LoginPortal }) => {
         className="w-full rounded-full"
         type="submit"
       >
-        {isSubmitting ? "Logging in…" : portal === "admin" ? "Log in as admin" : "Log in"}
+        {isSubmitting
+          ? "Logging in…"
+          : portal === "admin"
+            ? "Log in as admin"
+            : "Log in"}
       </Button>
 
-      {/* <FooterLink
-        text="Don't have an account"
-        linkText="Create an account"
-        href="/sign-up"
-      /> */}
-
+      <p className="text-sm text-gray-500">Forgot Password</p>
     </form>
   );
 };
