@@ -67,6 +67,42 @@
   --color-chart-1: var(--chart-1);
 }
 
+/* The values shadcn components read. Mapped onto your colours:
+   primary = the purple, ring = the purple, accent = a light tint of the cyan. */
+:root {
+  --background: #F9FAFB;
+  --foreground: #1E293E;
+  --card: #ffffff;
+  --card-foreground: #1E293E;
+  --popover: #ffffff;
+  --popover-foreground: #1E293E;
+  --primary: #6457f9;
+  --primary-foreground: #ffffff;
+  --secondary: #eeecff;
+  --secondary-foreground: #3b32b8;
+  --muted: #f1f3f8;
+  --muted-foreground: #5b6578;
+  --accent: #e3f9fa;
+  --accent-foreground: #0b5d63;
+  --destructive: #e5373a;
+  --border: #e2e5ee;
+  --input: #d5d9e5;
+  --ring: #6457f9;
+  --chart-1: #6457f9;
+  --chart-2: #00c8d4;
+  --chart-3: #34d399;
+  --chart-4: #fbbf24;
+  --chart-5: #ff4d4f;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1E293E;
+  --sidebar-primary: #6457f9;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eeecff;
+  --sidebar-accent-foreground: #3b32b8;
+  --sidebar-border: #e2e5ee;
+  --sidebar-ring: #6457f9;
+}
+
 @layer base {
   * {
     border-color: var(--color-border-default);
@@ -78,41 +114,18 @@
   }
   html {
     @apply font-sans;
+    color-scheme: light;
+    scroll-behavior: smooth;
   }
 }
 
-/* Dark-only theme — no light mode. All variables default to dark values. */
-:root {
-  --background: #080809;
-  --foreground: #f0f0f4;
-  --card: #111114;
-  --card-foreground: #f0f0f4;
-  --popover: #18181c;
-  --popover-foreground: #f0f0f4;
-  --primary: #00c8d4;
-  --primary-foreground: #080809;
-  --secondary: #18181c;
-  --secondary-foreground: #f0f0f4;
-  --muted: #1e1e23;
-  --muted-foreground: #808090;
-  --accent: #1e1e23;
-  --accent-foreground: #f0f0f4;
-  --destructive: #ff4d4f;
-  --border: #2a2a30;
-  --input: #2a2a30;
-  --ring: #00c8d4;
-  --radius: 0.75rem;
-  --chart-1: #00c8d4;
-  --chart-2: #6457f9;
-  --chart-3: #34d399;
-  --chart-4: #fbbf24;
-  --chart-5: #ff4d4f;
-  --sidebar: #111114;
-  --sidebar-foreground: #f0f0f4;
-  --sidebar-primary: #00c8d4;
-  --sidebar-primary-foreground: #080809;
-  --sidebar-accent: #1e1e23;
-  --sidebar-accent-foreground: #f0f0f4;
-  --sidebar-border: #2a2a30;
-  --sidebar-ring: #00c8d4;
+/* People who ask their system for less motion get no animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

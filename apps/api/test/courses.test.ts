@@ -55,6 +55,17 @@ describe('GET /api/courses', () => {
     expect(args.take).toBe(5);
   });
 
+  it('search looks at the title and the category, not the description', async () => {
+    db.findMany.mockResolvedValue([]);
+    db.count.mockResolvedValue(0);
+
+    await request(app).get('/api/courses?q=web%20development');
+
+    const searched = db.findMany.mock.calls[0]?.[0].where.OR.map((clause: object) => Object.keys(clause)[0]);
+    expect(searched).toEqual(['title', 'category']);
+    expect(db.findMany.mock.calls[0]?.[0].where.OR[1].category.contains).toBe('web development');
+  });
+
   it('rejects a limit above 50', async () => {
     const res = await request(app).get('/api/courses?limit=1000');
     expect(res.status).toBe(400);

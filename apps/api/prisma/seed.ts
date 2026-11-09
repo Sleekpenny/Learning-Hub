@@ -28,26 +28,35 @@ async function main() {
 
   console.log(`Admin ready: ${admin.email}`);
 
-  // Add the sample courses only when there are no courses yet
-  const courseCount = await prisma.course.count();
-  if (courseCount > 0) {
-    console.log(`Skipped sample courses (${courseCount} already exist)`);
-    return;
-  }
+  // Sample courses are matched by slug, so running the seed again is safe.
+  // New courses are created. Existing ones only get their lesson videos refreshed,
+  // so titles, descriptions and publish status you changed in the admin are kept.
+  let created = 0;
+  for (const { lessons, ...courseData } of sampleCourses) {
+    const existing = await prisma.course.findUnique({ where: { slug: courseData.slug } });
 
-  for (const course of sampleCourses) {
-    const { lessons, ...courseData } = course;
-    await prisma.course.create({
-      data: {
-        ...courseData,
-        published: true,
-        lessons: {
-          create: lessons.map((lesson:any, index:any) => ({ ...lesson, position: index + 1 })),
+    if (!existing) {
+      await prisma.course.create({
+        data: {
+          ...courseData,
+          published: true,
+          lessons: { create: lessons.map((lesson, index) => ({ ...lesson, position: index + 1 })) },
         },
-      },
-    });
+      });
+      created += 1;
+      continue;
+    }
+
+    for (const [index, lesson] of lessons.entries()) {
+      const position = index + 1;
+      await prisma.lesson.upsert({
+        where: { courseId_position: { courseId: existing.id, position } },
+        update: { videoUrl: lesson.videoUrl, durationSeconds: lesson.durationSeconds },
+        create: { ...lesson, courseId: existing.id, position },
+      });
+    }
   }
-  console.log(`Added ${sampleCourses.length} sample courses`);
+  console.log(`Sample courses: ${created} added, ${sampleCourses.length - created} refreshed`);
 }
 
 main()

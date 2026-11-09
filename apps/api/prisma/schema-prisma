@@ -22,6 +22,9 @@ model User {
   name         String
   passwordHash String
   role         Role     @default(LEARNER)
+  // Asked on the signup form. Optional in the database so the admin account and older users still work.
+  country        String?
+  areaOfInterest String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

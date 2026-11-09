@@ -18,6 +18,8 @@ export const validSignup = {
   name: 'Ada Lovelace',
   email: 'ada@example.com',
   password: 'Sup3rSecret',
+  country: 'Nigeria',
+  areaOfInterest: 'Web Development',
 };
 
 export function buildTestApp() {

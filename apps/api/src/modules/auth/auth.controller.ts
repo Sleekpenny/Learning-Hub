@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import type { Env } from '../../config/env';
 import { AppError } from '../../lib/errors';
 import { clearSessionCookies, REFRESH_COOKIE, setSessionCookies } from './auth.cookies';
+import { loginPortalSchema } from './auth.schemas';
 import type { AuthService } from './auth.service';
 
 type CookieEnv = Pick<Env, 'NODE_ENV' | 'ACCESS_TOKEN_TTL_MINUTES'>;
@@ -23,7 +24,11 @@ export class AuthController {
   };
 
   login = async (req: Request, res: Response) => {
-    const session = await this.service.login(req.body);
+    const portal = loginPortalSchema.safeParse(req.header('x-login-portal') ?? 'learner');
+    if (!portal.success) {
+      throw AppError.badRequest('X-Login-Portal must be "learner" or "admin"');
+    }
+    const session = await this.service.login(req.body, portal.data);
     setSessionCookies(res, session, this.env);
     res.json({ data: { user: session.user } });
   };

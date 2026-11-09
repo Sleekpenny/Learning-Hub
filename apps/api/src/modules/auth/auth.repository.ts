@@ -5,6 +5,8 @@ export interface CreateUserData {
   name: string;
   passwordHash: string;
   role: Role;
+  country?: string;
+  areaOfInterest?: string;
 }
 
 export interface CreateRefreshTokenData {
