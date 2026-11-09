@@ -98,3 +98,110 @@ export type Props = {
   course: Course;
   progress?: { progressPercent: number; status: Status };
 };
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: Role;
+  country: string | null;
+  areaOfInterest: string | null;
+  createdAt: string;
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  slug: string;
+  description: string;
+  category: string;
+  thumbnailUrl: string | null;
+  published: boolean;
+  createdAt: string;
+  lessonCount: number;
+  totalDurationSeconds: number;
+}
+
+// A course the logged in user is enrolled in, with their progress
+export interface MyCourse extends Course {
+  enrolledAt: string;
+  lastAccessedAt: string;
+  completedAt: string | null;
+  completedLessons: number;
+  progressPercent: number;
+  status: Status;
+  resumeLessonId: string | null;
+}
+
+export interface Meta {
+  page: number;
+  limit: number;
+  total: number;
+}
+
+export interface DashboardData {
+  stats: {
+    enrolledCourses: number;
+    inProgress: number;
+    completed: number;
+    lessonsCompleted: number;
+  };
+  continueLearning: MyCourse[];
+}
+
+// One lesson as listed on the course page (the video link is only sent when a lesson is opened)
+export interface LessonSummary {
+  id: string;
+  title: string;
+  description: string;
+  durationSeconds: number;
+  position: number;
+}
+
+export interface CourseDetail extends Course {
+  lessons: LessonSummary[];
+}
+
+// My progress in one course: GET /courses/:id/progress
+export interface CourseProgress {
+  enrolled: boolean;
+  enrolledAt: string | null;
+  lessonCount: number;
+  completedLessons: number;
+  progressPercent: number;
+  status: Status;
+  resumeLessonId: string | null;
+  lessons: { id: string; status: Status; positionSeconds: number }[];
+}
+
+// A lesson card in the "up next" list on the lesson page
+export interface LessonCard {
+  id: string;
+  title: string;
+  durationSeconds: number;
+  position: number;
+  status: Status;
+  positionSeconds: number;
+}
+
+// GET /lessons/:id
+export interface LessonDetail {
+  lesson: {
+    id: string;
+    title: string;
+    description: string;
+    videoUrl: string;
+    durationSeconds: number;
+    position: number;
+    courseId: string;
+    course: { id: string; title: string };
+  };
+  progress: { positionSeconds: number; completed: boolean };
+  nextLessonId: string | null;
+  lessons: LessonCard[];
+}
+
+// What PUT /lessons/:id/progress sends back
+export interface ProgressSaved {
+  course: { lessonCount: number; completedLessons: number; progressPercent: number; completed: boolean };
+}

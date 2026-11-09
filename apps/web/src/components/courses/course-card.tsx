@@ -7,7 +7,7 @@ import { formatDuration, lessonLabel } from "@/lib/format";
 
 const CourseCard = ({ course, progress }: Props) => {
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl border border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="relative aspect-video overflow-hidden bg-muted">
         {course.thumbnailUrl ? (
           // Thumbnails can come from any website, so a plain img is used instead of next/image
@@ -50,7 +50,7 @@ const CourseCard = ({ course, progress }: Props) => {
         </div>
 
         {progress && (
-          <div className="mt-4 border-t border pt-4">
+          <div className="mt-4 border-t pt-4">
             <div className="mb-2 flex items-center justify-between gap-2">
               <StatusBadge status={progress.status} />
               <span className="text-xs font-medium text-muted-foreground">{progress.progressPercent}%</span>
@@ -61,5 +61,6 @@ const CourseCard = ({ course, progress }: Props) => {
       </div>
     </article>
   );
+
 }
 export default CourseCard;

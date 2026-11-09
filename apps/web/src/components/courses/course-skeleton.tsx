@@ -2,7 +2,7 @@ import { Skeleton } from "../ui/state-message";
 
 const CourseCardSkeleton = () => {
   return (
-    <div className="overflow-hidden rounded-2xl border border bg-white" aria-hidden="true">
+    <div className="overflow-hidden rounded-2xl border bg-white" aria-hidden="true">
       <Skeleton className="aspect-video rounded-none" />
       <div className="space-y-3 p-5">
         <Skeleton className="h-5 w-3/4" />

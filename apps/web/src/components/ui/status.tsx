@@ -17,7 +17,7 @@ const styles: Record<Status, string> = {
 // The text always says the status, so colour is never the only signal
 export function StatusBadge({ status }: { status: Status }) {
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full whitespace-nowrap px-2.5 py-0.5 text-xs font-semibold ${styles[status]}`}>
+    <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold ${styles[status]}`}>
       {status === "COMPLETED" && <CheckIcon className="h-3 w-3" />}
       {labels[status]}
     </span>

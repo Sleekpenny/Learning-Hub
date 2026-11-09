@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
+import { Toaster } from "sonner";
 import { ApiError } from "@/lib/api";
 import { useAuthSync } from "@/lib/auth";
 
@@ -27,7 +28,6 @@ function getQueryClient() {
   return browserQueryClient;
 }
 
-// Keeps login and logout in step across open tabs
 function AuthSync() {
   useAuthSync();
   return null;
@@ -38,6 +38,7 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={getQueryClient()}>
       <AuthSync />
       {children}
+      <Toaster position="top-center" richColors closeButton />
     </QueryClientProvider>
   );
 }

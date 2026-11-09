@@ -12,6 +12,7 @@ import Link from "next/link";
 
 type NavItem = { href: string; status?: boolean; label: string };
 
+
 const links: Record<"learner" | "admin", NavItem[]> = {
   learner: [
     { href: "/dashboard", label: "Dashboard" },

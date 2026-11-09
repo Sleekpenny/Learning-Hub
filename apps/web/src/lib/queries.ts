@@ -1,8 +1,8 @@
 "use client";
 
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, request, toQuery } from "./api";
-import { Course, DashboardData, Meta, MyCourse } from "@/types/global";
+import { Course, CourseDetail, CourseProgress, DashboardData, LessonDetail, Meta, MyCourse } from "@/types/global";
 
 type CourseFilters = { q?: string; category?: string; page?: number; limit?: number };
 
@@ -44,4 +44,45 @@ export function useDashboard() {
     queryKey: ["dashboard"],
     queryFn: () => api<DashboardData>("/me/dashboard"),
   });
+}
+
+// One course with its lessons. Public: anyone can read it.
+export function useCourse(id: string) {
+  return useQuery({
+    queryKey: ["course", id],
+    queryFn: () => api<CourseDetail>(`/courses/${id}`),
+  });
+}
+
+// The logged in user's progress in one course: are they enrolled, and which lessons are done.
+// staleTime 0: always check again when the page opens, so a lesson finished a minute ago shows as completed.
+export function useCourseProgress(courseId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["course-progress", courseId],
+    queryFn: () => api<CourseProgress>(`/courses/${courseId}/progress`),
+    enabled,
+    staleTime: 0,
+  });
+}
+
+// One lesson to watch, with where the learner stopped and the other lessons of the course
+export function useLesson(id: string) {
+  return useQuery({
+    queryKey: ["lesson", id],
+    queryFn: () => api<LessonDetail>(`/lessons/${id}`),
+    staleTime: 0,
+  });
+}
+
+// Call the returned function after enrolling or finishing a lesson, so every screen that shows
+// progress (course page, lesson page, dashboard) loads the new numbers.
+export function useRefreshLearning() {
+  const queryClient = useQueryClient();
+  return (courseId: string) =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["course-progress", courseId] }),
+      queryClient.invalidateQueries({ queryKey: ["lesson"] }),
+      queryClient.invalidateQueries({ queryKey: ["my-courses"] }),
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
+    ]);
 }

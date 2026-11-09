@@ -19,8 +19,9 @@ const CourseProgressRow = ({ course }: { course: MyCourse }) => {
   const width = useFillTo(course.progressPercent);
   const completed = course.status === "COMPLETED";
 
-  return (
-    <li className="flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center">
+    return (
+
+     <li className="flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center">
       <div className="flex min-w-0 flex-1 items-center gap-4">
         {course.thumbnailUrl ? (
           // Thumbnails can come from any website, so a plain img is used instead of next/image
@@ -69,7 +70,8 @@ const CourseProgressRow = ({ course }: { course: MyCourse }) => {
       </div>
 
       <Link
-        href={`/courses/${course.id}`}
+        // Start or continue goes straight to the lesson. A finished course opens its page to review.
+        href={!completed && course.resumeLessonId ? `/lessons/${course.resumeLessonId}` : `/courses/${course.id}`}
         className={buttonVariants({ variant: completed ? "outline" : "default", size: "sm", className: "sm:w-28" })}
       >
         {actionLabel[course.status]}

@@ -22,10 +22,16 @@ type Options = {
 
 // If several requests fail at once, they all wait for the same single refresh
 let refreshing: Promise<boolean> | null = null;
+// When the last successful refresh finished. A request that was sent before that moment and failed
+// afterwards does not need another refresh: the new cookie is already there, it only has to be sent again.
+let lastRefreshedAt = 0;
 
 function refreshSession() {
   refreshing ??= fetch("/api/auth/refresh", { method: "POST", credentials: "include" })
-    .then((res) => res.ok)
+    .then((res) => {
+      if (res.ok) lastRefreshedAt = Date.now();
+      return res.ok;
+    })
     .catch(() => false)
     .finally(() => {
       refreshing = null;
@@ -33,13 +39,10 @@ function refreshSession() {
   return refreshing;
 }
 
-// Every API call in the app goes through this one function, so it is the place for things that apply
-// to all calls: the headers, the cookies, the network error message and the automatic session refresh.
-// (This is the Next.js version of an Angular HTTP interceptor. See docs/WEB.md.)
-// Returns the whole JSON body: { data, meta? }
 export async function request<T>(path: string, options: Options = {}): Promise<{ data: T; meta?: Meta }> {
   const { method = "GET", body, headers, skipRefresh = false } = options;
 
+  const sentAt = Date.now();
   let res: Response;
   try {
     res = await fetch(`/api${path}`, {
@@ -66,7 +69,7 @@ export async function request<T>(path: string, options: Options = {}): Promise<{
   // The access cookie lasts 15 minutes. When it is gone, ask for a new one with the refresh cookie
   // and repeat the same request once.
   const sessionProblem = res.status === 401 && ["TOKEN_EXPIRED", "UNAUTHENTICATED"].includes(error?.code);
-  if (sessionProblem && !skipRefresh && (await refreshSession())) {
+  if (sessionProblem && !skipRefresh && (lastRefreshedAt >= sentAt || (await refreshSession()))) {
     return request<T>(path, { ...options, skipRefresh: true });
   }
 
