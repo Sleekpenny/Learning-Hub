@@ -205,3 +205,67 @@ export interface LessonDetail {
 export interface ProgressSaved {
   course: { lessonCount: number; completedLessons: number; progressPercent: number; completed: boolean };
 }
+
+export interface AdminTotals {
+  learners: number;
+  publishedCourses: number;
+  draftCourses: number;
+  enrollments: number;
+  completedEnrollments: number;
+  lessonsCompleted: number;
+}
+
+export interface AdminDashboard {
+  totals: AdminTotals;
+  recentEnrollments: { id: string; learnerName: string; learnerEmail: string; courseTitle: string; enrolledAt: string }[];
+  topCourses: { id: string; title: string; enrollments: number }[];
+}
+
+// A lesson as the admin sees it: with the video link
+export interface AdminLesson {
+  id: string;
+  title: string;
+  description: string;
+  videoUrl: string;
+  durationSeconds: number;
+  position: number;
+}
+
+// GET /admin/courses/:id (also works for drafts)
+export interface AdminCourse extends Course {
+  lessons: AdminLesson[];
+}
+
+export interface CourseInput {
+  title: string;
+  category: string;
+  description: string;
+  thumbnailUrl: string | null;
+  published: boolean;
+}
+
+export interface LessonInput {
+  title: string;
+  description: string;
+  videoUrl: string;
+  durationSeconds: number;
+}
+
+export interface CourseLearner {
+  userId: string;
+  name: string;
+  email: string;
+  enrolledAt: string;
+  lastAccessedAt: string;
+  completedAt: string | null;
+  completedLessons: number;
+  progressPercent: number;
+}
+
+export interface AdminLearner {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+  enrolledCourses: number;
+}

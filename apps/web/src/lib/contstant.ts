@@ -1,3 +1,5 @@
+
+
 export const passwordRules = [
   { label: "At least 8 characters", test: (value: string) => value.length >= 8 },
   { label: "A lowercase letter", test: (value: string) => /[a-z]/.test(value) },
@@ -48,3 +50,20 @@ export const courses = [
   { title: "Product Design", status: "NOT_STARTED" as const, percent: 0, colors: "from-accent-primary to-emerald-400", offset: "ml-6" },
   { title: "Data and AI", status: "COMPLETED" as const, percent: 100, colors: "from-amber-400 to-pink-500", offset: "" },
 ];
+
+
+
+export const statusOptions = [
+  { label: "Published", value: "published" },
+  { label: "Draft", value: "draft" },
+];
+
+export const categoryOptions = [
+  "Web Development",
+  "Backend",
+  "Design",
+  "Data Science",
+  "Mobile",
+  "DevOps",
+  "Business",
+].map((category) => ({ label: category, value: category }));

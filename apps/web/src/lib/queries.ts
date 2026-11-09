@@ -2,12 +2,11 @@
 
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, request, toQuery } from "./api";
-import { Course, CourseDetail, CourseProgress, DashboardData, LessonDetail, Meta, MyCourse } from "@/types/global";
+import { AdminCourse, AdminDashboard, AdminLearner, Course, CourseDetail, CourseProgress, DashboardData, LessonDetail, Meta, MyCourse } from "@/types/global";
+
 
 type CourseFilters = { q?: string; category?: string; page?: number; limit?: number };
 
-// Published courses, with search, category filter and pages.
-// live: true keeps the list fresh while the tab is open (checks every minute and when the user returns).
 export function useCourses(filters: CourseFilters, { live = false } = {}) {
   return useQuery({
     queryKey: ["courses", filters],
@@ -84,5 +83,58 @@ export function useRefreshLearning() {
       queryClient.invalidateQueries({ queryKey: ["lesson"] }),
       queryClient.invalidateQueries({ queryKey: ["my-courses"] }),
       queryClient.invalidateQueries({ queryKey: ["dashboard"] }),
+    ]);
+}
+
+export function useAdminDashboard() {
+  return useQuery({
+    queryKey: ["admin-dashboard"],
+    queryFn: () => api<AdminDashboard>("/admin/dashboard"),
+    refetchInterval: 60 * 1000,
+  });
+}
+
+// All courses, drafts included
+export function useAdminCourses(filters: { q?: string; page?: number; limit?: number }) {
+  return useQuery({
+    queryKey: ["admin-courses", filters],
+    queryFn: async () => {
+      const { data, meta } = await request<Course[]>(`/admin/courses${toQuery(filters)}`);
+      return { courses: data, meta: meta as Meta };
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useAdminCourse(id: string) {
+  return useQuery({
+    queryKey: ["admin-course", id],
+    queryFn: () => api<AdminCourse>(`/admin/courses/${id}`),
+  });
+}
+
+export function useAdminLearners() {
+  return useQuery({
+    queryKey: ["admin-learners"],
+    queryFn: () => api<AdminLearner[]>("/admin/learners"),
+  });
+}
+
+// Call the returned function after the admin changes a course or its lessons, so the admin screens
+// and the public catalogue and course page show the change.
+export function useRefreshCourses() {
+  const queryClient = useQueryClient();
+  return (courseId?: string) =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["admin-courses"] }),
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] }),
+      queryClient.invalidateQueries({ queryKey: ["courses"] }),
+      queryClient.invalidateQueries({ queryKey: ["categories"] }),
+      ...(courseId
+        ? [
+            queryClient.invalidateQueries({ queryKey: ["admin-course", courseId] }),
+            queryClient.invalidateQueries({ queryKey: ["course", courseId] }),
+          ]
+        : []),
     ]);
 }

@@ -28,7 +28,7 @@ const SelectFields = ({
         name={name}
         control={control}
         rules={{
-          required: required ? `Please select ${label.toLowerCase}` : false,
+          required: required ? `Please select ${label.toLowerCase()}` : false,
         }}
         render={({ field }) => (
           <Select value={field.value} onValueChange={field.onChange}>

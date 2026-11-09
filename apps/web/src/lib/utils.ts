@@ -25,3 +25,20 @@ export function toFailure(error: unknown): { success: false; code: string; messa
   console.error(error);
   return { success: false, code: "UNKNOWN", message: "Something went wrong. Please try again.", };
 }
+
+export function isEmail(value: string) {
+  return /^\S+@\S+\.\S+$/.test(value.trim());
+}
+
+export function isUrl(value: string) {
+  try {
+    new URL(value.trim());
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function splitDuration(totalSeconds: number) {
+  return { minutes: Math.floor(totalSeconds / 60), seconds: totalSeconds % 60 };
+}

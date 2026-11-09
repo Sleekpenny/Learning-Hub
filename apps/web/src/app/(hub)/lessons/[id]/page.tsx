@@ -5,8 +5,10 @@ import LessonView from "@/components/lesson/lesson-view";
 
 export const metadata: Metadata = { title: "Lesson" };
 
+export const instant = false
+
 // Needs a login. Someone who is not enrolled gets the "Enroll to watch" message from the API's 403.
-export default async function LessonPage({ params }: { params: Promise<{ id: string }> }) {
+const LessonPage = async ({ params }: { params: Promise<{ id: string }> })  => {
   const { id } = await params;
   return (
     <RequireAuth>
@@ -16,3 +18,5 @@ export default async function LessonPage({ params }: { params: Promise<{ id: str
     </RequireAuth>
   );
 }
+
+export default LessonPage;
