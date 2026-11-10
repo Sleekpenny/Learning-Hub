@@ -13,6 +13,7 @@
     "lint": "npm --prefix apps/web run lint"
   },
   "devDependencies": {
-    "concurrently": "^9.0.0"
+    "concurrently": "^9.0.0",
+    "typescript": "^5.9.3"
   }
 }
