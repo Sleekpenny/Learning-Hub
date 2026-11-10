@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { courseProgress, lessonStatus } from '../src/lib/progress';
+import { courseProgress, lessonStatus } from './progress';
 
 describe('lessonStatus', () => {
   it('is NOT_STARTED when there is no progress row', () => {
