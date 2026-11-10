@@ -4,7 +4,7 @@ export type Status = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
 export type LoginPortal = "learner" | "admin";
 export type ActionResult<T> =
   | { success: true; data: T }
-  | { success: false; code: string; message: string; };
+  | { success: false; code: string; message: string;};
 
 
 export type FormInputProps = {
@@ -72,7 +72,7 @@ export interface DashboardData {
 }
 
 export interface SignUpFormData { 
-    fullName: string;
+  name: string;
   email: string;
   password: string;
   country: string;

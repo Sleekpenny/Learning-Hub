@@ -36,7 +36,7 @@ const SelectFields = ({
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
 
-            <SelectContent className="bg-gray-800 border-gray-600 text-white">
+            <SelectContent className="bg-gray-800 border-gray-600 text-white" >
               {options.map((option) => (
                 <SelectItem
                   className="focus:bg-gray-600 focus:text-white"

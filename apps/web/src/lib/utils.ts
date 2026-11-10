@@ -20,7 +20,7 @@ export function landingPath(role: Role, next: string | null) {
 
 export function toFailure(error: unknown): { success: false; code: string; message: string;  } {
   if (error instanceof ApiError) {
-    return { success: false, code: error.code, message: `error.message ${error.details},`  };
+    return { success: false, code: error.code, message: `error.message ${error.details},` };
   }
   console.error(error);
   return { success: false, code: "UNKNOWN", message: "Something went wrong. Please try again.", };

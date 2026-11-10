@@ -5,13 +5,15 @@ import InputFields from "../forms-components/input-forms";
 import { Button } from "../ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import { interests, passwordRules } from "@/lib/contstant";
-import { cn, safeNext } from "@/lib/utils";
+import { cn, landingPath, safeNext, toFailure } from "@/lib/utils";
 import { Check } from "lucide-react";
 import CountrySelectField from "../forms-components/country-fields";
 import Link from "next/link";
 import SelectFields from "../forms-components/select-forms";
 import { useStartSession } from "@/lib/auth";
 import { SignUpFormData } from "@/types/global";
+import { signupAction } from "@/actions/auth";
+import { toast } from "sonner";
 
 const SignUpForm = () => {
   const router = useRouter();
@@ -26,7 +28,7 @@ const SignUpForm = () => {
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormData>({
     defaultValues: {
-      fullName: "",
+      name: "",
       email: "",
       password: "",
       country: "",
@@ -36,29 +38,29 @@ const SignUpForm = () => {
   });
 
   const password = watch("password", "");
+
   const onSubmit = async (data: SignUpFormData) => {
-    try {
-        console.log(data)
-      //const result = await signupAction(form);
-      //startSession(result.data);
-      //router.replace(landingPath(result.data.role, next));
-    } catch (e) {
-      console.error(e);
-      //     toast.error('Sign in failed', {
-      //     description: Object.keys(result.fields).length === 0 ? result.message : null
-      //   })
-    }
+         const result = await signupAction(data);
+
+      if (!result.success) { 
+        toast.error(result.message, { description: Object.values(result).join(". ") || undefined });
+        return;        
+      }     
+
+      startSession(result.data);
+      router.replace(landingPath(result.data.role, next));
+    
   };
 
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <InputFields
-          name="fullName"
+          name="name"
           label="Full Name"
           placeholder="John Doe"
           register={register}
-          error={errors.fullName}
+          error={errors.name}
           validation={{ required: "Full name is required", minLength: 2 }}
         />
 
