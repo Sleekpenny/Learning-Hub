@@ -14,5 +14,5 @@
     "resolveJsonModule": true,
     "noEmit": true
   },
-  "include": ["src", "api", "test", "prisma", "scripts", "vitest.config.mts"]
+  "include": ["index.ts", "src", "test", "prisma", "scripts", "vitest.config.mts"]
 }

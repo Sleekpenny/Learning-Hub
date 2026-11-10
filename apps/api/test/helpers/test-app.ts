@@ -1,4 +1,4 @@
-import { createApp } from '../../src/app';
+  import { createApp } from '../../src/create-app';
 import type { Env } from '../../src/config/env';
 import { hashPassword } from '../../src/lib/password';
 import { InMemoryAuthRepository } from './in-memory-auth.repository';

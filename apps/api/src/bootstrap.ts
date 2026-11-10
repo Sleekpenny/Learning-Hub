@@ -1,5 +1,5 @@
 import type { Express } from 'express';
-import { createApp } from './app';
+import { createApp } from './create-app';
 import { loadEnv } from './config/env';
 import { prisma } from './lib/prisma';
 import { PrismaAuthRepository } from './modules/auth/auth.prisma-repository';
