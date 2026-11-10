@@ -13,7 +13,7 @@ cd apps/api
 cp .env.example .env        # then fill it in (see below)
 npm install                 # also runs `prisma generate`
 npm run db:migrate -- --name init   # creates the tables in Neon
-npm run db:seed             # creates the first admin from ADMIN_EMAIL / ADMIN_PASSWORD
+npm run db:seed             # creates the admin from ADMIN_EMAIL / ADMIN_PASSWORD and 15 sample courses
 npm run dev                 # http://localhost:4000/api/health
 ```
 
@@ -39,6 +39,7 @@ The app validates these at startup and prints exactly what is missing.
 | `npm run dev` | Dev server with auto-reload |
 | `npm test` | Runs the test suite (no database needed) |
 | `npm run typecheck` | TypeScript check |
+| `npm run check` | Diagnoses your setup (.env, database, tables, admin) in plain English |
 | `npm run db:migrate` | Create/apply a migration in development |
 | `npm run db:deploy` | Apply migrations in production |
 | `npm run db:seed` | Create/update the admin user |
@@ -49,7 +50,7 @@ The app validates these at startup and prints exactly what is missing.
 ```bash
 npm test
 ```
-Tests use an in-memory repository, so they run in about a second without Postgres. They cover signup, login, validation, cookies, token rotation and reuse detection, logout, `authenticate` and role-based authorization.
+Tests use an in-memory repository, so they run in about a second without Postgres. 136 tests in 9 files cover signup, login, validation, cookies, token rotation and reuse detection, logout, `authenticate` and role-based authorization, courses, lessons, enrollment, progress and the admin endpoints.
 
 ## Deploying to Vercel
 
@@ -60,8 +61,10 @@ Tests use an in-memory repository, so they run in about a second without Postgre
    `DIRECT_URL="…" DATABASE_URL="…" npm run db:deploy`, then `npm run db:seed`.
 5. Deploy. Check `https://<your-api>.vercel.app/api/health`.
 
-`vercel.json` routes every request to the Express app in `api/index.ts`.
+Vercel finds the Express app through `index.ts` in this folder (it default-exports the app). There is no `vercel.json`: Vercel handles Express projects without one.
 
 ## Documentation
+- **New to backend? Start here:** [`docs/SETUP.md`](docs/SETUP.md), a step-by-step guide
+- Interactive docs in your browser once the API runs: http://localhost:4000/api/docs
 - [`docs/API.md`](docs/API.md): endpoint reference with examples
 - [`docs/AUTH.md`](docs/AUTH.md): how authentication and authorization work, and why

@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LearnHub web
 
-## Getting Started
+The Next.js app for LearnHub: home page, sign up and login, course catalogue, course page, lesson player, learner dashboard and the admin area. Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, shadcn/ui, TanStack Query, react-hook-form.
 
-First, run the development server:
+## Run it
+
+This app needs the API running. From the **repo root**, follow the setup in the root `README.md`, then:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev          # web on http://localhost:3000, API on http://localhost:4000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+To run only the web app: copy `.env.example` to `.env.local` and run `npm run dev` here.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable | Meaning |
+|---|---|
+| `API_URL` | Address of the Express API. Local: `http://localhost:4000`. On Vercel: the API project's URL, without a trailing slash. It is read **at build time**. |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Command | Does |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build` | Production build (also type checks) |
+| `npm run start` | Serves the production build |
+| `npm run lint` | Lints the code |
 
-To learn more about Next.js, take a look at the following resources:
+## Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/          pages, in route groups: public, login and signup, learner area, admin area
+├── components/   reusable parts, grouped by feature (home, auth, courses, lessons, admin, layout, ui)
+├── actions/      every API call, as a function that returns { success, data } or { success: false, message }
+└── lib/          api request function (cookies, refresh and retry), queries, types, helpers
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Every `/api/*` request is forwarded to the API by a rewrite in `next.config.ts`, so the browser only talks to this site. See `ARCHITECTURE.md` at the repo root for the full picture.
