@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { Suspense, useState, type ReactNode } from "react";
 import { useCurrentUser, useSignOut } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { MenuIcon, X } from "lucide-react";
@@ -11,9 +11,9 @@ import { Navbar } from "@/components/layout/nav-bar";
 import Link from "next/link";
 
 type NavItem = { href: string; status?: boolean; label: string };
+type Variant = "learner" | "admin";
 
-
-const links: Record<"learner" | "admin", NavItem[]> = {
+const links: Record<Variant, NavItem[]> = {
   learner: [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/courses", label: "Browse courses" },
@@ -21,19 +21,20 @@ const links: Record<"learner" | "admin", NavItem[]> = {
   admin: [{ href: "/admin", label: "Overview" }],
 };
 
-const Sidebar = ({
-  children,
-  variant = "learner",
+/**
+ * The only component that reads the URL. It must stay inside <Suspense>
+ * so the rest of the layout can be prerendered.
+ */
+const SidebarNav = ({
+  variant,
+  onNavigate,
 }: {
-  children: ReactNode;
-  variant?: "learner" | "admin";
+  variant: Variant;
+  onNavigate?: () => void;
 }) => {
-  const { user } = useCurrentUser();
-  const { signOut, error } = useSignOut();
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
 
-  const nav = (
+  return (
     <nav
       aria-label={variant === "admin" ? "Admin" : "Dashboard"}
       className="flex flex-col gap-1"
@@ -46,7 +47,7 @@ const Sidebar = ({
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            onClick={() => setMenuOpen(false)}
+            onClick={onNavigate}
             className={cn(
               "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
               active
@@ -59,6 +60,32 @@ const Sidebar = ({
         );
       })}
     </nav>
+  );
+};
+
+const NavFallback = () => (
+  <div className="flex flex-col gap-1" aria-hidden="true">
+    {[0, 1].map((i) => (
+      <div key={i} className="h-10 animate-pulse rounded-xl bg-muted" />
+    ))}
+  </div>
+);
+
+const Sidebar = ({
+  children,
+  variant = "learner",
+}: {
+  children: ReactNode;
+  variant?: Variant;
+}) => {
+  const { user } = useCurrentUser();
+  const { signOut, error } = useSignOut();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const nav = (
+    <Suspense fallback={<NavFallback />}>
+      <SidebarNav variant={variant} onNavigate={() => setMenuOpen(false)} />
+    </Suspense>
   );
 
   const account = (
@@ -78,7 +105,9 @@ const Sidebar = ({
 
   return (
     <>
-      <Navbar />
+      <Suspense fallback={null}>
+        <Navbar />
+      </Suspense>
       <Container className="min-h-screen lg:flex">
         <aside className="hidden w-64 shrink-0 flex-col justify-between border-r bg-white p-5 lg:flex">
           <div className="space-y-8">
@@ -96,7 +125,7 @@ const Sidebar = ({
 
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-30 border-b bg-white lg:hidden">
-            <div className="flex h-16 items-center justify-between px-4">            
+            <div className="flex h-16 items-center justify-between px-4">
               <button
                 type="button"
                 className="rounded-lg p-2 hover:bg-muted"

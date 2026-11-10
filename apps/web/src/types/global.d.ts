@@ -1,3 +1,5 @@
+import type { Control, FieldError, FieldValues, Path } from "react-hook-form";
+
 export type Role = "LEARNER" | "ADMIN";
 export type Status = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
 
@@ -83,16 +85,15 @@ export interface SignInFormData {
     password: string,
     email:string
 }
-
-export type SelectFieldProps = {
-        name: string;
-        label: string;
-        placeholder: string;
-        options: readonly Option[];
-        control: Control;
-        error?: FieldError;
-        required?: boolean;
-    };
+export interface SelectFieldProps<T extends FieldValues = FieldValues> {
+  required?: boolean;
+  error?: FieldError;
+  control: Control<T>;
+  options: { label: string; value: string }[];
+  placeholder?: string;
+  label: string;
+  name: Path<T>;
+}
 
 export type Props = {
   course: Course;

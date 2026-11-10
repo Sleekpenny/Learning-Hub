@@ -133,6 +133,8 @@ const SignUpForm = () => {
             required
           />
 
+          
+
           <SelectFields
             name="areaOfInterest"
             label="Area of interest"
