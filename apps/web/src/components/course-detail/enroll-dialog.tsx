@@ -83,10 +83,10 @@ export function EnrollDialog({ open, onOpenChange, course, lesson, loggedIn }: P
             </DialogHeader>
             <DialogFooter>
               <Button asChild variant="outline">
-                <Link href={`/signup?next=${next}`}>Create account</Link>
+                <Link href={`/sign-up?next=${next}`}>Create account</Link>
               </Button>
               <Button asChild>
-                <Link href={`/login?next=${next}`}>Sign in</Link>
+                <Link href={`/sign-in?next=${next}`}>Sign in</Link>
               </Button>
             </DialogFooter>
           </>

@@ -10,8 +10,6 @@ const CourseCard = ({ course, progress }: Props) => {
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <div className="relative aspect-video overflow-hidden bg-muted">
         {course.thumbnailUrl ? (
-          // Thumbnails can come from any website, so a plain img is used instead of next/image
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={course.thumbnailUrl}
             alt=""
