@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { logoutAction } from "@/actions/auth";
 import { api, ApiError } from "./api";
 import { User } from "@/types/global";
@@ -17,8 +17,6 @@ async function fetchMe() {
   }
 }
 
-// The logged in user, or null. Every component that calls this shares one request.
-// It also checks again when the user comes back to the tab, so a session that ended is noticed.
 export function useCurrentUser() {
   const query = useQuery({
     queryKey: ["me"],
@@ -27,11 +25,14 @@ export function useCurrentUser() {
     refetchOnWindowFocus: true,
     retry: false,
   });
-  return { user: query.data ?? null, isLoading: query.isPending };
+
+  const hydrated = useSyncExternalStore(subscribeNothing, () => true, () => false);
+
+  return { user: hydrated ? (query.data ?? null) : null, isLoading: !hydrated || query.isPending };
 }
 
-// ---- Keeping tabs in step ----
-// When someone logs in or out in one tab, the other open tabs find out straight away.
+const subscribeNothing = () => () => {};
+
 
 const CHANNEL = "learnhub-auth";
 

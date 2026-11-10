@@ -6,11 +6,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useStartSession } from "@/lib/auth";
 import { LoginPortal, SignInFormData } from "@/types/global";
 import { loginAction } from "@/actions/auth";
+import { landingPath, safeNext } from "@/lib/utils";
+import { toast } from "sonner";
 
 const LogInForm = ({ portal }: { portal: LoginPortal }) => {
   const startSession = useStartSession();
   const router = useRouter();
-  //const next = safeNext(useSearchParams().get("next"));
+  const next = safeNext(useSearchParams().get("next"));
 
   const {
     register,
@@ -25,17 +27,16 @@ const LogInForm = ({ portal }: { portal: LoginPortal }) => {
   });
 
   const onSubmit = async (data: SignInFormData) => {
-    try {
-      const result = await loginAction(data, portal);
-      console.log(data);
-      //startSession(result);
-      //router.replace(landingPath(result.data.role, next));
-    } catch (e) {
-      console.error(e);
-      //     toast.error('Sign in failed', {
-      //     description: Object.keys(result.fields).length === 0 ? result.message : null
-      //   })
-    }
+    const result = await loginAction(data, portal);
+
+    if (!result.success) {
+    toast.error(result.message, { description: Object.values('result').join(". ") || undefined });
+    return;
+  }
+
+  await startSession(result.data);
+  router.replace(landingPath(result.data.role, next));
+
   };
 
   return (
@@ -86,3 +87,7 @@ const LogInForm = ({ portal }: { portal: LoginPortal }) => {
 };
 
 export default LogInForm;
+function setError(arg0: string, arg1: { message: unknown; }) {
+  throw new Error("Function not implemented.");
+}
+

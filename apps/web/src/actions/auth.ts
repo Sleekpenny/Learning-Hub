@@ -2,7 +2,6 @@ import { api } from "@/lib/api";
 import { toFailure } from "@/lib/utils";
 import { ActionResult, LoginPortal, Role, SignInFormData, SignUpFormData, User } from "@/types/global";
 
-
 export async function loginAction( formData: SignInFormData, portal: LoginPortal): Promise<ActionResult<User>> {
   try {
     const { user } = await api<{ user: User }>("/auth/login", {
