@@ -38,7 +38,7 @@ Creates a **learner** account and logs the user in.
 
 Body
 ```json
-{ "name": "Ada Lovelace", "email": "ada@example.com", "password": "Sup3rSecret" }
+{ "name": "Ada Lovelace", "email": "ada@example.com", "password": "Sup3rSecret", "country": "Nigeria", "areaOfInterest": "Web Development" }
 ```
 Rules: name 2–80 chars · valid email (trimmed, lowercased) · password 8–72 chars with a lowercase letter, an uppercase letter and a number. Any extra field (e.g. `role`) is ignored.
 
@@ -50,7 +50,18 @@ Sets cookies `access_token` and `refresh_token`. Errors: `400 VALIDATION_ERROR`,
 
 ## `POST /api/auth/login`
 Body `{ "email": "...", "password": "..." }` → `200` same shape as signup, cookies set.
-Errors: `400`, `401 INVALID_CREDENTIALS`, `429`.
+
+Header `X-Login-Portal: learner | admin` says which login form was used. No header means `learner`.
+The role has to match, and it is checked only after the password is correct:
+
+| Form used | Account is | Result |
+|---|---|---|
+| `admin` | ADMIN | `200`, session created |
+| `admin` | LEARNER | `403 NOT_ADMIN`, no cookies |
+| `learner` / none | LEARNER | `200`, session created |
+| `learner` / none | ADMIN | `403 USE_ADMIN_LOGIN`, no cookies |
+
+Errors: `400` (bad body or unknown header value), `401 INVALID_CREDENTIALS`, `403 NOT_ADMIN`, `403 USE_ADMIN_LOGIN`, `429`.
 
 ## `POST /api/auth/refresh`
 No body. Uses the `refresh_token` cookie. Rotates it and issues a fresh pair.
@@ -70,7 +81,12 @@ Returns the logged-in user. `200 { "data": { "user": {…} } }` · Errors: `401`
 # sign up (-c saves cookies to a file, -b sends them back)
 curl -i -c jar.txt -X POST http://localhost:4000/api/auth/signup \
   -H "Content-Type: application/json" \
-  -d '{"name":"Ada Lovelace","email":"ada@example.com","password":"Sup3rSecret"}'
+  -d '{"name":"Ada Lovelace","email":"ada@example.com","password":"Sup3rSecret","country":"Nigeria","areaOfInterest":"Web Development"}'
+
+# admin login (note the header)
+curl -i -c admin.txt -X POST http://localhost:4000/api/auth/login \
+  -H "Content-Type: application/json" -H "X-Login-Portal: admin" \
+  -d '{"email":"<ADMIN_EMAIL>","password":"<ADMIN_PASSWORD>"}'
 
 # who am I?
 curl -b jar.txt http://localhost:4000/api/auth/me

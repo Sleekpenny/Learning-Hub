@@ -7,6 +7,8 @@ export interface UserRecord {
   name: string;
   passwordHash: string;
   role: Role;
+  country: string | null;
+  areaOfInterest: string | null;
   createdAt: Date;
 }
 
@@ -16,6 +18,8 @@ export interface PublicUser {
   email: string;
   name: string;
   role: Role;
+  country: string | null;
+  areaOfInterest: string | null;
   createdAt: Date;
 }
 
@@ -41,6 +45,8 @@ export function toPublicUser(user: UserRecord): PublicUser {
     email: user.email,
     name: user.name,
     role: user.role,
+    country: user.country,
+    areaOfInterest: user.areaOfInterest,
     createdAt: user.createdAt,
   };
 }

@@ -42,6 +42,12 @@ REFRESH TOKEN EXPIRED / REVOKED
   browser ── POST /api/auth/refresh ──▶ 401 { code: "SESSION_EXPIRED" }  → redirect to /login
 ```
 
+## Admin login rule
+
+The web app has a Learner tab and an Admin tab on the login page. The Admin tab adds the header `X-Login-Portal: admin` to `POST /api/auth/login`. After the password is verified, `AuthService.login` compares the form with the account's role and refuses a mismatch with `403` and **no cookies**. The check comes after the password check on purpose: a stranger guessing emails always sees the same `401`, so they cannot find out which accounts are admins.
+
+The header only picks the form. Real protection is the role inside the signed access token: every `/api/admin/*` route runs `authenticate` and `requireRole('ADMIN')`, so a learner who logs in normally and calls an admin endpoint by hand still gets `403`.
+
 ## Security decisions (and why)
 
 1. **Passwords are hashed with bcrypt** (cost 12). A database leak does not reveal passwords. Passwords are limited to 72 characters because bcrypt ignores everything after 72 bytes.

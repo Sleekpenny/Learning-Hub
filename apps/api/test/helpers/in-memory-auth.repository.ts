@@ -25,7 +25,13 @@ export class InMemoryAuthRepository implements AuthRepository {
     if (this.users.some((u) => u.email === data.email)) {
       throw AppError.conflict('An account with this email already exists', 'EMAIL_TAKEN');
     }
-    const user: UserRecord = { id: randomUUID(), createdAt: new Date(), ...data };
+    const user: UserRecord = {
+      id: randomUUID(),
+      createdAt: new Date(),
+      country: null,
+      areaOfInterest: null,
+      ...data,
+    };
     this.users.push(user);
     return user;
   }
