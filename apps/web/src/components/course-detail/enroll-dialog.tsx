@@ -14,12 +14,10 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   course: { id: string; title: string };
-  // The lesson the user clicked. After enrolling they are taken straight to it.
   lesson: LessonSummary | null;
   loggedIn: boolean;
 };
 
-// Asks the user to enroll. Logged out users are asked to sign in first.
 export function EnrollDialog({ open, onOpenChange, course, lesson, loggedIn }: Props) {
   const router = useRouter();
   const refresh = useRefreshLearning();

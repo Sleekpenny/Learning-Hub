@@ -59,11 +59,11 @@ export const statusOptions = [
 ];
 
 export const categoryOptions = [
-  "Web Development",
-  "Backend",
-  "Design",
-  "Data Science",
-  "Mobile",
-  "DevOps",
-  "Business",
-].map((category) => ({ label: category, value: category }));
+  {value: 'Web Development', label:'Web Development'},
+  {value: 'Backend', label:'Backend'},
+  {value: 'Design', label:'Design'},
+  {value: 'Data Science', label:'Data Science'},
+  {value: 'Mobile', label:'Mobile'},
+  {value: 'DevOps', label:'DevOps'},
+  {value: 'Business', label:'Business'},
+]
